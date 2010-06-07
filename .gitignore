@@ -1,0 +1,14 @@
+# MacOS directory info
+.DS_Store
+._*
+
+# swapfiles
+*~
+*.swp
+
+# old versions
+*.old
+
+# results and server state folders
+results
+server_state

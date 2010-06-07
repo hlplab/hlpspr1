@@ -1,0 +1,44 @@
+/* This software is licensed under a BSD license; see the LICENSE file for details. */
+
+$.widget("ui.FlashSentence", {
+    _init: function () {
+        this.cssPrefix = this.options._cssPrefix;
+        this.finishedCallback = this.options._finishedCallback;
+        this.utils = this.options._utils;
+
+        this.sentence = this.options.s;
+        this.timeout = dget(this.options, "timeout", 2000);
+
+        this.sentenceDescType = dget(this.options, "sentenceDescType", "literal");
+        assert(this.sentenceDescType == "md5" || this.sentenceDescType == "literal", "Bad value for 'sentenceDescType' option of FlashSentence controller.");
+        if (this.sentenceDescType == "md5") {
+            var canonicalSentence = this.sentence.split('/\s/').join(' ');
+            this.sentenceMD5 = hex_md5(canonicalSentence);
+        }
+        else {
+            this.sentenceMD5 = csv_url_encode(this.options.s);
+        }
+
+        this.element.addClass(this.cssPrefix + "flashed-sentence");
+        this.element.append(this.sentence);
+
+        if (this.timeout) {
+            var t = this;
+            this.utils.setTimeout(function() {
+                t.finishedCallback([[["Sentence (or sentence MD5)", t.sentenceMD5]]]);
+            }, this.timeout);
+        }
+        else {
+            // Give results without actually finishing.
+            if (this.utils.setResults)
+                this.utils.setResults([[["Sentence (or sentence MD5)", this.sentenceMD5]]]);
+        }
+    }
+});
+
+ibex_controller_set_properties("FlashSentence", {
+    obligatory: ["s"],
+    htmlDescription: function (opts) {
+        return $(document.createElement("div")).text(opts.s)[0];
+    }
+});
