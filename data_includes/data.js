@@ -23,17 +23,12 @@ var items = [
 ["sep", "Separator", { }],
 
 ["intro", "Message", {consentRequired: true,
-                      html: { include: "example_intro.html" } } ],
+                      html: { include: "intro.html" } } ],
 
-["info", "Form", {
-                     html: { include: "example_info.html" },
-                     validators: {
-                         age: function (s) { if (s.match(/^\d+$/)) return true; else return "Bad value for \u2018age\u2019"; }
-                     }
-                 } ],
+["info", "Form", {html: { include: "info.html" }, } ],
 
 ["break", "Message", {transfer: 10000,
-                      html: { include: "example_transfer.html" } } ],
+                      html: { include: "transfer.html" } } ],
 
 ["practice", ds, {s: "This is a practice sentence to get you used to reading sentences like this."}],
 ["practice", ds, {s: "This is another practice sentence with a practice question following it."},
@@ -108,11 +103,6 @@ var items = [
                              "A man entering the country"]}],
 [["q1",[700,7]], q, {s: "Which consignment did the official bar from entering the country after deeming its owner to be a threat?"}],
 [["q1",[700,7]], q, {s: "Which consignment did the official bar its owner from entering the country after deeming to be a threat?"}],
-
-/*[["s1",8], ds, {s: "The baker followed a recipe which he expected to be a great success after reading in a magazine."}],
-[["s2",8], ds, {s: "The baker followed a recipe which after reading in a magazine he expected to be a great success."}],
-[["q1",[800,8]], q, {s: "Which recipie did the baker expect to be a great success after reading its X in a magazine."}],
-[["q2",[800,8]], q, {s: "Which recipie did the baker expect its author to be a great success after reading in a magazine."}]*/
 
 // 21 fillers (3 for each real sentence).
 ["f", ds, {s: "The foreign spy that encoded the top-secret messages was given a new mission that required going to Japan."},
