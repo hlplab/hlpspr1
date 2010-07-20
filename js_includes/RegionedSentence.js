@@ -1,8 +1,8 @@
 /* This software is licensed under a BSD license; see the LICENSE file for details. */
 
 /* Modified: 6/9/2010 by Andrew Wood
-	This file has been modified to achieve linger-like tagging capabilities (the functionality of the @
-	symbol has been changed).  See lines 29 and 240 for the edits. 
+    This file has been modified to achieve linger-like tagging capabilities (the functionality of the @
+    symbol has been changed).  See lines 29 and 240 for the edits.
 */
 
 function boolToInt(x) { if (x) return 1; else return 0; }
@@ -28,19 +28,19 @@ $.widget("ui.DashedSentence", {
 
 // NEW @ SYMBOL BEHAVIOR (Linger-like tags)
         this.stoppingPoint = this.words.length;
-	this.tags = new Array(this.words.length -1);
-	
-	for( var i=0; i<this.words.length; i++ ){
-		var tmpsplit = this.words[i].split("@");
-		this.words[i] = tmpsplit[0];  //word to be displayed
-		if(tmpsplit.length >1) 
-			this.tags[i] = tmpsplit[1]; //remember the tag, if there is one
-		else
-			this.tags[i] = "";
-	}
+    this.tags = new Array(this.words.length -1);
+
+    for( var i=0; i<this.words.length; i++ ){
+        var tmpsplit = this.words[i].split("@");
+        this.words[i] = tmpsplit[0];  //word to be displayed
+        if(tmpsplit.length >1)
+            this.tags[i] = tmpsplit[1]; //remember the tag, if there is one
+        else
+            this.tags[i] = "";
+    }
 
 // OLD @ SYMBOL BEHAVIOR
-//	this.stoppingPoint = this.words.length;
+//       this.stoppingPoint = this.words.length;
 //       for (var i = 0; i < this.words.length; ++i) {
 //            if (stringStartsWith("@", this.words[i])) {
 //                this.words[i] = this.words[i].substring(1);
@@ -237,7 +237,7 @@ $.widget("ui.DashedSentence", {
             this.resultsLines.push([
                 ["Word number", i+1],
                 ["Word", csv_url_encode(this.words[i])],
-		["Tag", csv_url_encode(this.tags[i])], //new column for the tag
+                ["Tag", csv_url_encode(this.tags[i])], //new column for the tag
                 ["Reading time", this.sprResults[i][0] - this.sprResults[i][1]],
                 ["Newline?", boolToInt(((i+1) > 0) && (this.wordDivs[i].offsetTop !=
                                                        this.wordDivs[i+1].offsetTop))],
