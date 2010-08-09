@@ -1,13 +1,16 @@
 /* This software is licensed under a BSD license; see the LICENSE file for details. */
 
-/* Modified: 6/9/2010 by Andrew Wood
-    This file has been modified to achieve linger-like tagging capabilities (the functionality of the @
-    symbol has been changed).  See lines 29 and 240 for the edits.
+/* Based on DashedSentence.js
+ * This file has been modified to achieve linger-like tagging capabilities
+ * (the functionality of the @ symbol has been changed). 
+ *
+ * Modified: 6/9/2010 by Andrew Wood
+ * Modified: 7/21/2010 by Andrew Watts
 */
 
 function boolToInt(x) { if (x) return 1; else return 0; }
 
-$.widget("ui.DashedSentence", {
+$.widget("ui.RegionedSentence", {
     _init: function() {
         this.cssPrefix = this.options._cssPrefix;
         this.utils = this.options._utils;
@@ -16,7 +19,7 @@ $.widget("ui.DashedSentence", {
         if (typeof(this.options.s) == "string")
             this.words = this.options.s.split(/\s+/);
         else {
-            assert_is_arraylike(this.options.s, "Bad value for 's' option of DashedSentence.");
+            assert_is_arraylike(this.options.s, "Bad value for 's' option of RegionedSentence.");
             this.words = this.options.s;
         }
         this.mode = dget(this.options, "mode", "self-paced reading");
@@ -26,28 +29,18 @@ $.widget("ui.DashedSentence", {
         this.showBehind = dget(this.options, "showBehind", true);
         this.currentWord = 0;
 
-// NEW @ SYMBOL BEHAVIOR (Linger-like tags)
+        // NEW @ SYMBOL BEHAVIOR (Linger-like tags)
         this.stoppingPoint = this.words.length;
-    this.tags = new Array(this.words.length -1);
+        this.tags = new Array(this.words.length -1);
 
-    for( var i=0; i<this.words.length; i++ ){
-        var tmpsplit = this.words[i].split("@");
-        this.words[i] = tmpsplit[0];  //word to be displayed
-        if(tmpsplit.length >1)
-            this.tags[i] = tmpsplit[1]; //remember the tag, if there is one
-        else
-            this.tags[i] = "";
-    }
-
-// OLD @ SYMBOL BEHAVIOR
-//       this.stoppingPoint = this.words.length;
-//       for (var i = 0; i < this.words.length; ++i) {
-//            if (stringStartsWith("@", this.words[i])) {
-//                this.words[i] = this.words[i].substring(1);
-//                this.stoppingPoint = i + 1;
-//                break;
-//            }
-//        }
+        for( var i=0; i<this.words.length; i++ ){
+            var tmpsplit = this.words[i].split("@");
+            this.words[i] = tmpsplit[0];  //word to be displayed
+            if(tmpsplit.length >1)
+                this.tags[i] = tmpsplit[1]; //remember the tag, if there is one
+            else
+                this.tags[i] = "";
+        }
 
         this.mainDiv = $("<div>");
         this.element.append(this.mainDiv);
@@ -66,13 +59,16 @@ $.widget("ui.DashedSentence", {
 
         // Precalculate MD5 of sentence.
         this.sentenceDescType = dget(this.options, "sentenceDescType", "literal");
-        assert(this.sentenceDescType == "md5" || this.sentenceDescType == "literal", "Bad value for 'sentenceDescType' option of DashedSentence.");
+        assert(this.sentenceDescType == "md5" || this.sentenceDescType == "literal", "Bad value for 'sentenceDescType' option of RegionedSentence.");
         if (this.sentenceDescType == "md5") {
             var canonicalSentence = this.words.join(' ');
             this.sentenceDesc = hex_md5(canonicalSentence);
         }
         else {
-            this.sentenceDesc = csv_url_encode(this.options.s);
+            if (typeof(this.options.s) == "string")
+		        this.sentenceDesc = csv_url_encode(this.options.s);
+	        else
+		        this.sentenceDesc = csv_url_encode(this.options.s.join(' '));
         }
 
         this.mainDiv.addClass(this.cssPrefix + "sentence");
@@ -80,7 +76,7 @@ $.widget("ui.DashedSentence", {
         this.resultsLines = [];
         if (this.mode == "self-paced reading") {
             // Don't want to be allocating arrays in time-critical code.
-            this.sprResults = new Array(this.words.length - 1);
+            this.sprResults = new Array(this.words.length);
             for (var i = 0; i < this.sprResults.length; ++i)
                 this.sprResults[i] = new Array(2);
         }
@@ -110,8 +106,8 @@ $.widget("ui.DashedSentence", {
             }
             function wordPauseTimeout() {
                 t.showWord(t.currentWord);
-                this.utils.clearTimeout(wordPauseTimeout);
-                this.utils.setTimeout(wordTimeout, t.wordTime);
+                t.utils.clearTimeout(wordPauseTimeout);
+                t.utils.setTimeout(wordTimeout, t.wordTime);
             }
             this.utils.setTimeout(wordTimeout, this.wordTime);
         }
@@ -143,7 +139,7 @@ $.widget("ui.DashedSentence", {
                     // *** goToNext() ***
 //                    t.recordSprResult(time, t.currentWord);
                     var word = t.currentWord;
-                    if (word > 0 && word < t.stoppingPoint) {
+                    if (word > 0 && word <= t.stoppingPoint) {
                         var rs = t.sprResults[word-1];
                         rs[0] = time;
                         rs[1] = t.previousTime;
@@ -239,15 +235,15 @@ $.widget("ui.DashedSentence", {
                 ["Word", csv_url_encode(this.words[i])],
                 ["Tag", csv_url_encode(this.tags[i])], //new column for the tag
                 ["Reading time", this.sprResults[i][0] - this.sprResults[i][1]],
-                ["Newline?", boolToInt(((i+1) > 0) && (this.wordDivs[i].offsetTop !=
-                                                       this.wordDivs[i+1].offsetTop))],
+                ["Newline?", boolToInt(((i+1) < this.wordDivs.length) &&
+                                       (this.wordDivs[i].offsetTop != this.wordDivs[i+1].offsetTop))],
                 ["Sentence (or sentence MD5)", this.sentenceDesc]
             ]);
         }
     }
 });
 
-ibex_controller_set_properties("DashedSentence", {
+ibex_controller_set_properties("RegionedSentence", {
     obligatory: ["s"],
     htmlDescription: function (opts) {
         return $(document.createElement("div")).text(opts.s);
