@@ -29,13 +29,14 @@ $.widget("ui.RegionedSentence", {
         this.showBehind = dget(this.options, "showBehind", true);
         this.currentWord = 0;
 
-        // NEW @ SYMBOL BEHAVIOR (Linger-like tags)
+        // NEW @ SYMBOL BEHAVIOR (Linger-like tags) ----------
+        // also show words connected by '_' together without the '_'
         this.stoppingPoint = this.words.length;
         this.tags = new Array(this.words.length -1);
 
         for( var i=0; i<this.words.length; i++ ){
             var tmpsplit = this.words[i].split("@");
-            this.words[i] = tmpsplit[0];  //word to be displayed
+            this.words[i] = tmpsplit[0].replace("_"," ");  //word to be displayed (with '_' replaced by ' ')
             if(tmpsplit.length >1)
                 this.tags[i] = tmpsplit[1]; //remember the tag, if there is one
             else
